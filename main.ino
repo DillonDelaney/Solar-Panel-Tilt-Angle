@@ -1,4 +1,13 @@
+#include <EEPROM.h>
+// EEPROM addresses
+const int calibDateAddress = 0; // Address to store the calibration date
+const int elapsedDaysAddress = 2; // Address to store elapsed days since calibration
+int calibrationDay = 1; // Day of the year when calibration was done
+int elapsedDays = 0; // Days elapsed since calibration
 
+// Write these values to EEPROM only once, manually uncomment these lines to set or reset the calibration
+//writeIntToEEPROM(calibDateAddress, calibrationDay);
+//writeIntToEEPROM(elapsedDaysAddress, elapsedDays);
 
 // Relay control pins
 const int relayPin1 = 4;
@@ -208,6 +217,10 @@ void setup() {
 }
 
 void loop() {
+  // Read the calibration date and elapsed days from EEPROM
+  int calibrationDay = readIntFromEEPROM(calibDateAddress);
+  int elapsedDays = readIntFromEEPROM(elapsedDaysAddress);
+  
   unsigned long now = millis(); // Get current time in milliseconds
   unsigned long timeElapsed = now - lastUpdateTime;
 
@@ -215,8 +228,8 @@ void loop() {
     lastUpdateTime = now; // Update the last update time
 
     // Simulate day of the year based on elapsed time
-    // Note: This is a simplified simulation and might need adjustments for accurate day/year calculations
-    int currentDayOfYear = (timeElapsed / dayDuration) % 365 + 1;
+    // Calculate the current day based on the calibration date and elapsed days
+    int currentDayOfYear = (calibrationDay + elapsedDays) % 365; // Simple calculation, adjust for leap years as needed
     bool direction;
     float extension;
 
@@ -233,14 +246,30 @@ void loop() {
     }
 
     moveMotor(direction);
-
+    
     Serial.print("Day ");
     Serial.print(currentDayOfYear);
     Serial.print(": Direction ");
     Serial.print(direction ? "Increasing" : "Decreasing");
     Serial.print(", Extension: ");
     Serial.println(extension);
+    elapsedDays++;
+    //writeIntToEEPROM(elapsedDaysAddress, elapsedDays);
   }
+}
+
+// Function to write an integer (e.g., day of the year) to EEPROM at a specific address
+void writeIntToEEPROM(int address, int value) {
+  byte lowByte = value & 0xFF; // Extract the low byte
+  byte highByte = (value >> 8) & 0xFF; // Extract the high byte
+  EEPROM.update(address, lowByte); // Write the low byte (minimizes unnecessary writes)
+  EEPROM.update(address + 1, highByte); // Write the high byte
+}
+// Function to read an integer (e.g., day of the year) from EEPROM at a specific address
+int readIntFromEEPROM(int address) {
+  byte lowByte = EEPROM.read(address);
+  byte highByte = EEPROM.read(address + 1);
+  return (int)lowByte | ((int)highByte << 8);
 }
 
 void moveMotor(bool direction) {
