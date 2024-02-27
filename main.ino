@@ -20,7 +20,7 @@ const unsigned long dayDuration = 86400000; // 24 hours in milliseconds for simu
 
 // Actuator extension values for half year
 //First Claebration has to be the extension of 13.1mm from start
-const float actuatorExtensions[182] = {0, 
+const float actuatorExtensions[183] = {0, 
 0.745434505272101, 
 0.764841036454982, 
 0.784135655221348, 
@@ -202,8 +202,7 @@ const float actuatorExtensions[182] = {0,
 2.08072331883602, 
 2.07877415448274, 
 2.07675909146872, 
-2.07467863767909
-};
+2.07467863767909};
 
 void setup() {
   pinMode(relayPin1, OUTPUT);
@@ -233,12 +232,12 @@ void loop() {
     bool direction;
     float extension;
 
-    if (currentDayOfYear <= 182) {
+    if (currentDayOfYear <= 183) {
       direction = true;
       extension = actuatorExtensions[currentDayOfYear - 1];
-    } else if (currentDayOfYear > 182 && currentDayOfYear <= 364) {
+    } else if (currentDayOfYear > 183 && currentDayOfYear <= 366) {
       direction = false;
-      int reverseIndex = 364 - currentDayOfYear;
+      int reverseIndex = 366 - currentDayOfYear;
       extension = actuatorExtensions[reverseIndex];
     } else {
       direction = false;
