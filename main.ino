@@ -9,10 +9,6 @@ int elapsedDays = 0; // Days elapsed since calibration
 //writeIntToEEPROM(calibDateAddress, calibrationDay);
 //writeIntToEEPROM(elapsedDaysAddress, elapsedDays);
 
-// Relay control pins
-const int relayPin1 = 4;
-const int relayPin2 = 5;
-
 // Variables for timing and direction
 const int totalDays = 365;
 unsigned long lastUpdateTime = 0; // Store the last update time in milliseconds
@@ -205,10 +201,16 @@ const float actuatorExtensions[183] = {0,
 2.07467863767909};
 
 void setup() {
-  pinMode(relayPin1, OUTPUT);
-  pinMode(relayPin2, OUTPUT);
-  digitalWrite(relayPin1, LOW);
-  digitalWrite(relayPin2, LOW);
+
+  pinMode(RPWM,OUTPUT);//BTS Code
+  pinMode(LPWM,OUTPUT); //BTS Code
+  
+  pinMode(LEN,OUTPUT); //BTS Code
+  pinMode(REN,OUTPUT); //BTS Code
+  
+  digitalWrite(REN,HIGH);//BTS Code
+  digitalWrite(LEN,HIGH); //BTS Code
+
   Serial.begin(9600);
 
   // Set the initial last update time
@@ -244,7 +246,7 @@ void loop() {
       extension = actuatorExtensions[0];
     }
 
-    moveMotor(direction);
+    moveMotor(direction, extension);
     
     Serial.print("Day ");
     Serial.print(currentDayOfYear);
@@ -271,19 +273,20 @@ int readIntFromEEPROM(int address) {
   return (int)lowByte | ((int)highByte << 8);
 }
 
-void moveMotor(bool direction) {
-  digitalWrite(relayPin1, LOW);
-  digitalWrite(relayPin2, LOW);
+void moveMotor(bool direction, float extension) {
+  analogWrite(LPWM,0); //BTS Code
+  analogWrite(RPWM,0); //BTS Code
 
   if (direction) {
-    digitalWrite(relayPin1, HIGH);
+    analogWrite(RPWM,0); //BTS Code
+    analogWrite(LPWM,255); // BTS Code
   } else {
-    digitalWrite(relayPin2, HIGH);
+    analogWrite(RPWM,255); //BTS Code
+    analogWrite(LPWM,0); // BTS Code
   }
 
-  unsigned long duration = 5000; // Example duration
-  delay(duration);
+  delay(extension);
 
-  digitalWrite(relayPin1, LOW);
-  digitalWrite(relayPin2, LOW);
+  analogWrite(LPWM,0); //BTS Code
+  analogWrite(RPWM,0); //BTS Code
 }
