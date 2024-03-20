@@ -278,11 +278,11 @@ void moveMotor(bool direction, float extension) {
   analogWrite(RPWM,0); //BTS Code
 
   if (direction) {
-    analogWrite(RPWM,255); //BTS Code
-    analogWrite(LPWM,0); // BTS Code
-  } else {
     analogWrite(RPWM,0); //BTS Code
     analogWrite(LPWM,255); // BTS Code
+  } else {
+    analogWrite(RPWM,255); //BTS Code
+    analogWrite(LPWM,0); // BTS Code
   }
 
   delay(extension);
