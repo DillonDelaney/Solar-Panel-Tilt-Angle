@@ -1,0 +1,18 @@
+void loop() {
+  // Read the state of the pushbutton value:
+  buttonState = digitalRead(buttonPin);
+
+  // Clear the LCD screen before the next display:
+  lcd.clear();
+
+  if (buttonState == HIGH) {
+    // Button is pressed - Display Occupied
+    lcd.print("Occupied");
+  } else {
+    // Button is not pressed - Display Vacant
+    lcd.print("Vacant");
+  }
+
+  // Wait a bit before refreshing
+  delay(1000);
+}
